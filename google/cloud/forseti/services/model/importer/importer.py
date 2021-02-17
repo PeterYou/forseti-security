@@ -168,7 +168,7 @@ class EmptyImporter(object):
     def run(self):
         """Runs the import."""
 
-        self.session.merge(self.model)
+        self.session..merge(self.model)
         self.model.add_description(
             json.dumps(
                 {'source': 'empty', 'pristine': True},
@@ -176,7 +176,7 @@ class EmptyImporter(object):
             )
         )
         self.model.set_done()
-        self.session.commit(ignore=True)
+        self.session.commit()
 
 
 class InventoryImporter(object):
@@ -211,7 +211,7 @@ class InventoryImporter(object):
         self.dao = dao
         self.service_config = service_config
         self.inventory_index_id = inventory_index_id
-        self.session.merge(self.model)
+        self.session..merge(self.model)
 
         self.role_cache = {}
         self.permission_cache = {}
@@ -236,7 +236,7 @@ class InventoryImporter(object):
     def _commit_session(self):
         """Commit the session with rollback on errors."""
         try:
-            self.session.commit(ignore=True)
+            self.session.commit()
         except SQLAlchemyError:
             LOGGER.exception(
                 'Unexpected SQLAlchemyError occurred during model creation.')
@@ -392,7 +392,7 @@ class InventoryImporter(object):
             self.model.set_done(item_counter)
         finally:
             LOGGER.debug('Finished running importer.')
-            self.session.commit(ignore=True)
+            self.session.commit()
             self.session.autocommit = autocommit
             self.session.autoflush = autoflush
     # pylint: enable=too-many-statements

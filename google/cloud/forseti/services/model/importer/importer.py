@@ -168,7 +168,7 @@ class EmptyImporter(object):
     def run(self):
         """Runs the import."""
 
-        self.session.merge(self.model)
+        self.session.add(self.model)
         self.model.add_description(
             json.dumps(
                 {'source': 'empty', 'pristine': True},
@@ -211,7 +211,7 @@ class InventoryImporter(object):
         self.dao = dao
         self.service_config = service_config
         self.inventory_index_id = inventory_index_id
-        self.session.merge(self.model)
+        self.session.add(self.model)
 
         self.role_cache = {}
         self.permission_cache = {}
@@ -287,8 +287,8 @@ class InventoryImporter(object):
                                             GCP_TYPE_LIST):
                 item_counter += 1
                 self._store_resource(resource)
-                if not item_counter % 1000:
-                    # Flush database every 1000 resources
+                if not item_counter % 100:
+                    # Flush database every 100 resources
                     LOGGER.debug('Flushing model write session: %s',
                                  item_counter)
                     self._flush_session()
@@ -473,7 +473,7 @@ class InventoryImporter(object):
                 name=member,
                 type=m_type,
                 member_name=name)
-            self.session.merge(self.member_cache[member])
+            self.session.add(self.member_cache[member])
 
     def _store_gsuite_membership_post(self):
         """Flush storing gsuite memberships."""
@@ -527,7 +527,7 @@ class InventoryImporter(object):
                 name=member,
                 type=m_type,
                 member_name=name)
-            self.session.merge(self.member_cache[member])
+            self.session.add(self.member_cache[member])
 
         parent_group = group_name(parent)
 
@@ -599,14 +599,14 @@ class InventoryImporter(object):
                         name=member,
                         type=m_type,
                         member_name=name)
-                    self.session.merge(self.member_cache_policies[member])
+                    self.session.add(self.member_cache_policies[member])
                 db_members.add(self.member_cache_policies[member])
 
             binding_object = self.dao.TBL_BINDING(
                 resource_type_name=policy_type_name,
                 role_name=role,
                 members=list(db_members))
-            self.session.merge(binding_object)
+            self.session.add(binding_object)
         self._convert_iam_policy(policy)
 
     def _store_resource(self, resource):
@@ -732,7 +732,7 @@ class InventoryImporter(object):
             data=resource.get_resource_data_raw(),
             parent=parent)
 
-        self.session.merge(row)
+        self.session.add(row)
         if cached:
             self._add_to_cache(row, resource.id)
 
@@ -1063,7 +1063,7 @@ class InventoryImporter(object):
             data=cloudsqlinstance.get_resource_data_raw(),
             parent=parent)
 
-        self.session.merge(resource)
+        self.session.add(resource)
 
     def _convert_dataset_policy(self, dataset_policy):
         """Convert a dataset policy to a database object.
@@ -1088,7 +1088,7 @@ class InventoryImporter(object):
             data=dataset_policy.get_resource_data_raw(),
             parent=parent)
 
-        self.session.merge(resource)
+        self.session.add(resource)
 
     def _convert_enabled_apis(self, enabled_apis):
         """Convert a description of enabled APIs to a database object.
@@ -1111,7 +1111,7 @@ class InventoryImporter(object):
             data=enabled_apis.get_resource_data_raw(),
             parent=parent)
 
-        self.session.merge(resource)
+        self.session.add(resource)
 
     def _convert_gcs_policy(self, gcs_policy):
         """Convert a gcs policy to a database object.
@@ -1134,7 +1134,7 @@ class InventoryImporter(object):
             data=gcs_policy.get_resource_data_raw(),
             parent=parent)
 
-        self.session.merge(resource)
+        self.session.add(resource)
 
     def _convert_iam_policy(self, iam_policy):
         """Convert an IAM policy to a database object.
@@ -1160,7 +1160,7 @@ class InventoryImporter(object):
             data=iam_policy.get_resource_data_raw(),
             parent_type_name=parent_type_name)
 
-        self.session.merge(resource)
+        self.session.add(resource)
 
     def _convert_role(self, role):
         """Convert a role to a database object.
@@ -1189,7 +1189,7 @@ class InventoryImporter(object):
                 if perm_name not in self.permission_cache:
                     permission = self.dao.TBL_PERMISSION(name=perm_name)
                     self.permission_cache[perm_name] = permission
-                    self.session.merge(permission)
+                    self.session.add(permission)
                 db_permissions.append(self.permission_cache[perm_name])
 
         dbrole = self.dao.TBL_ROLE(
@@ -1200,7 +1200,7 @@ class InventoryImporter(object):
             custom=is_custom,
             permissions=db_permissions)
         self.role_cache[data['name']] = dbrole
-        self.session.merge(dbrole)
+        self.session.add(dbrole)
         LOGGER.debug('Adding role %s to session', role_name)
 
         if is_custom:
@@ -1217,7 +1217,7 @@ class InventoryImporter(object):
                 parent=parent)
 
             self._add_to_cache(role_resource, role.id)
-            self.session.merge(role_resource)
+            self.session.add(role_resource)
             LOGGER.debug('Adding role resource :%s to session', role_name)
             LOGGER.debug('Role resource :%s', role_resource)
 
@@ -1248,7 +1248,7 @@ class InventoryImporter(object):
             data=service_config.get_resource_data_raw(),
             parent=parent)
 
-        self.session.merge(resource)
+        self.session.add(resource)
 
     def _convert_bigquery_table(self, table):
         """Convert a table to a database object.

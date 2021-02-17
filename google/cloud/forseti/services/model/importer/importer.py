@@ -168,7 +168,7 @@ class EmptyImporter(object):
     def run(self):
         """Runs the import."""
 
-        self.session..merge(self.model)
+        self.session.merge(self.model)
         self.model.add_description(
             json.dumps(
                 {'source': 'empty', 'pristine': True},
@@ -211,7 +211,7 @@ class InventoryImporter(object):
         self.dao = dao
         self.service_config = service_config
         self.inventory_index_id = inventory_index_id
-        self.session..merge(self.model)
+        self.session.merge(self.model)
 
         self.role_cache = {}
         self.permission_cache = {}
